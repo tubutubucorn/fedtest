@@ -24,4 +24,4 @@ jobs:
 
       - name: Verify context
         run: |
-          az storage blob download  --account-name iamazurelab3bd9fdeb3 --container-name flag  --name flag.txt
+          az storage account list
