@@ -18,7 +18,7 @@ jobs:
       - name: Az login via OIDC (UAMI)
         uses: azure/login@v2
         with:
-          client-id: 66fe1acc-2ff9-4ce0-bc11-70d29672893e
+          client-id: b03c874d-bfc6-4173-9cf0-48440733c8f2
           tenant-id: azure.training.hacktricks.xyz
           subscription-id: 2ebd44a4-e4dd-42e1-8e95-7e4a84601d47
 
