@@ -1,0 +1,28 @@
+name: Azure OIDC Login
+
+on:
+  push:
+    branches: [ "main" ]   # FICのsubjectと一致させる
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Az login via OIDC (UAMI)
+        uses: azure/login@v2
+        with:
+          client-id: 66fe1acc-2ff9-4ce0-bc11-70d29672893e
+          tenant-id: azure.training.hacktricks.xyz
+          subscription-id: 2ebd44a4-e4dd-42e1-8e95-7e4a84601d47
+
+      - name: Verify context
+        run: |
+          az account show
+          az group list -o table | head -n 20
